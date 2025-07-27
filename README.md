@@ -1,8 +1,4 @@
-# React Native Video App
-
-A React Native application for recording, managing, and uploading videos with local and remote storage capabilities. Features a custom Supabase upload implementation with real-time progress tracking.
-
-## 📱 Features
+# 📱 Features
 
 - **Video Recording**: Capture videos with front/back camera switching
 - **Local Video Management**: View, play, and delete local videos
@@ -98,12 +94,6 @@ export const uploadVideo = async (
 
 **Why Base64?** React Native file system reads files as base64 strings, but HTTP uploads need binary data. The conversion ensures compatibility while maintaining upload progress tracking.
 
-**Key Benefits:**
-
-- Real-time progress tracking
-- Better error handling
-- Direct HTTP upload bypassing SDK limitations
-
 ## 📱 Screens
 
 - **CameraScreen**: Video recording with camera controls
@@ -113,7 +103,7 @@ export const uploadVideo = async (
 
 ## 🔐 Configuration
 
-**Note**: Keys are exposed for demo purposes. In production, use environment variables.
+**Note**: Keys are exposed for demo purposes.
 
 ```typescript
 // src/utils/config.ts
@@ -139,20 +129,3 @@ export const roleService = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
    ```bash
    npm run android
    ```
-
-## 🧪 Testing
-
-```bash
-npm test
-```
-
-## 📝 Key Implementation Notes
-
-- **Custom Upload**: Bypassed Supabase SDK for progress tracking
-- **File Processing**: Local files converted to buffer for upload
-- **Progress UI**: Real-time progress display with animations
-- **Android Only**: Optimized for Android platform
-
----
-
-**Demo Project**: This is a technical test implementation with exposed keys for demonstration purposes.
