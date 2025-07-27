@@ -32,6 +32,10 @@
 - ✅ **react-navigation**: Navigation implementation with tabs and stack
 - ✅ **Clean Code**: Well-structured, commented, and organized codebase
 
+## 🎥 Demo Video
+
+📱 **App Demo**: [Watch the app in action](https://drive.google.com/file/d/13895j-8SOoSlA4O15zpI7cLbyXiNLyN-/view?usp=sharing)
+
 ## 🏗️ Project Structure
 
 ```
