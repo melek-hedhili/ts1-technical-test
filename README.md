@@ -1,97 +1,132 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# React Native Video App
 
-# Getting Started
+A React Native application for recording, managing, and uploading videos with local and remote storage capabilities. Features a custom Supabase upload implementation with real-time progress tracking.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## 📱 Features
 
-## Step 1: Start Metro
+- **Video Recording**: Capture videos with front/back camera switching
+- **Local Video Management**: View, play, and delete local videos
+- **Remote Video Management**: View, play, and delete videos from Supabase storage
+- **Custom Upload Progress**: Real-time upload progress (bypasses Supabase SDK limitations)
+- **Video Player**: Full-featured player with controls and progress tracking
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+## 🏗️ Project Structure
 
-To start the Metro dev server, run the following command from the root of your React Native project:
-
-```sh
-# Using npm
-npm start
-
-# OR using Yarn
-yarn start
+```
+src/
+├── components/           # UI components
+├── screens/            # Main screens
+├── services/           # Business logic
+├── types/              # TypeScript definitions
+└── utils/              # Utilities and config
 ```
 
-## Step 2: Build and run your app
+## 🔧 Technical Requirements
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+- **React Native**: 0.80.1
+- **Android SDK**: API 33 (Android 13)
+- **Android NDK**: 25.1.8937393
+- **Node.js**: >= 18
+- **Platform**: Android only
 
-### Android
+## 🚀 Custom Supabase Upload
 
-```sh
-# Using npm
-npm run android
+The app implements a custom upload solution because Supabase's default upload doesn't provide progress callbacks:
 
-# OR using Yarn
-yarn android
+```typescript
+export const uploadVideo = async (
+  localPath: string,
+  filename: string,
+  onProgress?: (pct: number) => void,
+): Promise<string> => {
+  const url = `https://${projectId}.supabase.co/storage/v1/object/${bucket}/${filename}`;
+
+  // Read file and convert to buffer
+  const fileData = await RNFS.readFile(localPath, 'base64');
+  const fileBuffer = Buffer.from(fileData, 'base64');
+
+  // Use axios for progress tracking
+  await axios.post(url, fileBuffer, {
+    headers: {
+      'Content-Type': 'video/mp4',
+      Authorization: `Bearer ${roleService}`,
+    },
+    onUploadProgress: progressEvent => {
+      if (progressEvent.total && onProgress) {
+        const percentage = (progressEvent.loaded / progressEvent.total) * 100;
+        onProgress(percentage);
+      }
+    },
+  });
+
+  return publicUrl;
+};
 ```
 
-### iOS
+### File Processing Process:
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+1. **Base64 Reading**: `RNFS.readFile(localPath, 'base64')` reads the video file from local storage and converts it to base64 string
+2. **Buffer Conversion**: `Buffer.from(fileData, 'base64')` converts the base64 string back to a binary buffer that axios can upload
+3. **Direct Upload**: The buffer is sent directly to Supabase's storage endpoint via HTTP POST
+4. **Progress Tracking**: Axios `onUploadProgress` callback provides real-time upload progress
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+**Why Base64?** React Native file system reads files as base64 strings, but HTTP uploads need binary data. The conversion ensures compatibility while maintaining upload progress tracking.
 
-```sh
-bundle install
+**Key Benefits:**
+
+- Real-time progress tracking
+- Better error handling
+- Direct HTTP upload bypassing SDK limitations
+
+## 📱 Screens
+
+- **CameraScreen**: Video recording with camera controls
+- **LocalVideosScreen**: Manage local videos with upload option
+- **RemoteVideosScreen**: View and manage cloud videos
+- **VideoPlayerScreen**: Play videos with upload/delete controls
+
+## 🔐 Configuration
+
+**Note**: Keys are exposed for demo purposes. In production, use environment variables.
+
+```typescript
+// src/utils/config.ts
+export const url = 'https://icmmdaacjaowtklhlokt.supabase.co';
+export const roleService = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
 ```
 
-Then, and every time you update your native dependencies, run:
+## 🚀 Getting Started
 
-```sh
-bundle exec pod install
+1. **Install Dependencies**
+
+   ```bash
+   npm install
+   ```
+
+2. **Start Metro**
+
+   ```bash
+   npm start
+   ```
+
+3. **Run on Android**
+   ```bash
+   npm run android
+   ```
+
+## 🧪 Testing
+
+```bash
+npm test
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+## 📝 Key Implementation Notes
 
-```sh
-# Using npm
-npm run ios
+- **Custom Upload**: Bypassed Supabase SDK for progress tracking
+- **File Processing**: Local files converted to buffer for upload
+- **Progress UI**: Real-time progress display with animations
+- **Android Only**: Optimized for Android platform
 
-# OR using Yarn
-yarn ios
-```
+---
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
-
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
-
-## Step 3: Modify your app
-
-Now that you have successfully run the app, let's make changes!
-
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
-
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+**Demo Project**: This is a technical test implementation with exposed keys for demonstration purposes.
